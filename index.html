@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বাংলাদেশ সাহরী ও ইফতার সময়সূচী ২০২৬</title>
+    <title>সাহরী ও ইফতার সময়সূচী ২০২৬</title>
     <style>
         :root {
-            --bg-color: #f0f4f8;
-            --text-color: #2d3436;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
             --card-bg: #ffffff;
-            --primary-color: #1b8d5a;
-            --accent-color: #e67e22;
-            --shadow: 0 10px 25px rgba(0,0,0,0.1);
-            --border-radius: 15px;
+            --primary-color: #059669;
+            --accent-color: #d97706;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --border-radius: 16px;
         }
 
         [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #f5f6fa;
-            --card-bg: #2d2d2d;
-            --primary-color: #2ecc71;
-            --shadow: 0 10px 25px rgba(0,0,0,0.4);
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --card-bg: #1e293b;
+            --primary-color: #10b981;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', sans-serif; }
@@ -28,74 +28,59 @@
         .container { max-width: 550px; width: 100%; }
 
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .badge { background: var(--primary-color); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; }
-
         .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 20px; margin-bottom: 15px; box-shadow: var(--shadow); text-align: center; }
         
-        .selection-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
-        select, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; background: var(--card-bg); color: var(--text-color); }
-        button { background: var(--primary-color); color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        button:hover { filter: brightness(1.1); }
+        select, button { width: 100%; padding: 12px; margin: 5px 0; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; background: var(--card-bg); color: var(--text-color); }
+        button { background: var(--primary-color); color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .time-display { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .time-card { background: var(--bg-color); padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--primary-color); }
+        .time-card { background: var(--bg-color); padding: 15px; border-radius: 12px; border-top: 5px solid var(--primary-color); }
         .time-val { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
 
-        .countdown-box { background: linear-gradient(135deg, var(--primary-color), #145a32); color: white; padding: 25px; }
-        .timer { font-size: 2.6rem; font-weight: bold; letter-spacing: 2px; }
+        .countdown-box { background: linear-gradient(135deg, var(--primary-color), #065f46); color: white; }
+        .timer { font-size: 2.8rem; font-weight: bold; letter-spacing: 2px; }
 
         .dua-section { text-align: left; }
-        .arabic { font-size: 1.5rem; color: var(--primary-color); text-align: right; margin: 10px 0; font-family: 'serif'; }
+        .arabic { font-size: 1.6rem; color: var(--primary-color); text-align: right; margin: 10px 0; font-family: 'Amiri', serif; line-height: 1.8; }
+        .pronunciation { font-style: italic; color: var(--accent-color); margin-bottom: 5px; font-weight: 600; }
         
-        .reference-box { font-size: 0.85rem; opacity: 0.9; text-align: left; border-left: 4px solid var(--accent-color); background: rgba(230, 126, 34, 0.05); }
-        .mode-toggle { cursor: pointer; font-size: 1.3rem; }
+        .reference-box { font-size: 0.85rem; text-align: left; background: #fffbeb; border-left: 5px solid var(--accent-color); color: #92400e; }
+        [data-theme="dark"] .reference-box { background: #451a03; color: #fde68a; }
+        
+        .status-msg { font-size: 0.85rem; padding: 5px; font-weight: bold; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&family=Amiri&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div>
-            <h2 id="app-title">সাহরী ও ইফতার ২০২৬</h2>
-            <span class="badge">বাংলাদেশ স্পেশাল</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <span class="mode-toggle" id="theme-toggle">🌙</span>
-        </div>
+        <h2>সাহরী ও ইফতার ২০২৬</h2>
+        <span id="theme-toggle" style="cursor:pointer; font-size: 1.5rem;">🌙</span>
     </header>
 
     <div class="card">
-        <button id="btn-detect">📍 অটো ডিটেক্ট (বর্তমান অবস্থান)</button>
-        <p style="margin: 12px 0; font-size: 0.85rem; font-weight: bold;">- অথবা উপজেলা সিলেক্ট করুন -</p>
-        
-        <div class="selection-grid">
-            <select id="select-division">
-                <option value="">বিভাগ নির্বাচন করুন</option>
-            </select>
-            <select id="select-district" disabled>
-                <option value="">জেলা নির্বাচন করুন</option>
-            </select>
-            <select id="select-upazila" disabled>
-                <option value="">উপজেলা নির্বাচন করুন</option>
-            </select>
-        </div>
-        <p id="status-msg" style="font-size: 0.8rem; margin-top: 10px; font-weight: bold;"></p>
+        <button id="btn-detect">📍 অটো-ডিটেক্ট (আমার এলাকা)</button>
+        <div style="margin: 10px 0; font-size: 0.8rem; opacity: 0.7;">- অথবা হাতে নির্বাচন করুন -</div>
+        <select id="select-division"><option value="">বিভাগ</option></select>
+        <select id="select-district" disabled><option value="">জেলা</option></select>
+        <select id="select-upazila" disabled><option value="">উপজেলা</option></select>
+        <div id="status" class="status-msg"></div>
     </div>
 
     <div class="card countdown-box">
-        <p id="next-event-text">পরবর্তী ইভেন্ট</p>
-        <div class="timer" id="timer-display">০০:০০:০০</div>
+        <p id="timer-label">বাকি সময়</p>
+        <div class="timer" id="timer">০০:০০:০০</div>
     </div>
 
     <div class="card">
-        <h3 id="location-name">ঢাকা, বাংলাদেশ</h3>
-        <p id="date-gregorian">-- --- ----</p>
-        <p id="date-hijri" style="color: var(--accent-color); font-weight: bold;">-- --- ----</p>
-        
+        <h3 id="loc-display">ঢাকা, বাংলাদেশ</h3>
+        <p id="date-en" style="font-weight: bold;">-- --- ----</p>
+        <p id="date-hj" style="color: var(--accent-color);">-- --- ----</p>
         <div class="time-display">
             <div class="time-card">
-                <small>সাহরী (শেষ সময়)</small>
+                <small>সাহরী শেষ (সতর্কতা)</small>
                 <div class="time-val" id="val-sehri">--:--</div>
             </div>
             <div class="time-card">
@@ -106,244 +91,187 @@
     </div>
 
     <div class="card dua-section">
-        <h3>🤲 প্রয়োজনীয় দোয়া</h3>
+        <h3>🤲 মাসনুন দোয়া</h3>
         <div style="margin-top:15px;">
             <strong>সাহরীর নিয়ত:</strong>
             <p class="arabic">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</p>
-            <small>উচ্চারণ: নাওয়াইতু আন আসুমা গাদাম মিন শাহরি রামাদানাল মুবারাক।</small>
+            <p class="pronunciation">উচ্চারণ: নাওয়াইতু আন আসুমা গাদাম মিন শাহরি রামাদানাল মুবারাক।</p>
+            <small>অর্থ: আমি আগামীকাল পবিত্র রমজান মাসের রোজা রাখার নিয়ত করলাম।</small>
         </div>
         <hr style="margin:15px 0; opacity:0.1;">
         <div>
             <strong>ইফতারের দোয়া:</strong>
-            <p class="arabic">اللَّهُمَّ لَكَ صُمْতُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</p>
-            <small>উচ্চারণ: আল্লাহুম্মা লাকা সুমতু ওয়া আলা রিযকিকা আফতারতু।</small>
+            <p class="arabic">اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</p>
+            <p class="pronunciation">উচ্চারণ: আল্লাহুম্মা লাকা সুমতু ওয়া আলা রিযকিকা আফতারতু।</p>
+            <small>অর্থ: হে আল্লাহ! আমি তোমারই জন্য রোজা রেখেছি এবং তোমারই দেয়া রিযিক দ্বারা ইফতার করছি।</small>
         </div>
     </div>
 
     <div class="card reference-box">
-        <strong>📚 তথ্যসূত্র ও সোর্স বক্স:</strong>
-        <ul style="margin-top:8px; margin-left:18px; line-height: 1.5;">
-            <li><strong>ডেটা সোর্স:</strong> Aladhan Prayer API (University of Islamic Sciences, Karachi)।</li>
-            <li><strong>গণনা পদ্ধতি:</strong> বাংলাদেশের প্রেক্ষাপটে ইফতারের সময়সূচীতে <strong>২ মিনিট সতর্কতা মূলক বাড়তি সময়</strong> যোগ করা হয়েছে যা ইসলামিক ফাউন্ডেশনের ক্যালেন্ডারের সাথে সামঞ্জস্যপূর্ণ।</li>
-            <li><strong>লোকেশন:</strong> বাংলাদেশ সরকারের ওপেন ডেটাবেস থেকে উপজেলা তালিকা সংগৃহীত।</li>
-            <li><strong>সতর্কতা:</strong> স্থানীয় মসজিদের আজান অনুসরণ করা সর্বোত্তম।</li>
+        <strong>📚 তথ্যসূত্র বক্স:</strong>
+        <ul style="margin-top:5px; margin-left:20px;">
+            <li><strong>এপিআই:</strong> Aladhan Prayer Times API (করাচি মেথড)।</li>
+            <li><strong>সমন্বয়:</strong> বাংলাদেশের আবহাওয়া ও স্থানীয় ক্যালেন্ডার অনুযায়ী ইফতারের সময়ের সাথে <strong>২ মিনিট সতর্কতা সময়</strong> যোগ করা হয়েছে।</li>
+            <li><strong>সতর্কতা:</strong> সাহরীর সময় শেষ হওয়ার অন্তত ৩ মিনিট আগে খাওয়া বন্ধ করা উত্তম। সঠিক সময়ের জন্য স্থানীয় মসজিদের আজান অনুসরণ করুন।</li>
         </ul>
     </div>
 </div>
 
 <script>
-    // BD Data Structure (Sample data for 64 districts & Upazilas)
-    // বাস্তব অ্যাপে বড় ডেটাবেস প্রয়োজন, এখানে প্রধানগুলো দেওয়া হলো। 
-    const bdLocationData = {
-        "Dhaka": {
-            name: "ঢাকা",
-            districts: {
-                "Dhaka": ["Dhaka City", "Dhamrai", "Dohar", "Keraniganj", "Nawabganj", "Savar"],
-                "Gazipur": ["Gazipur City", "Kaliakair", "Kaliganj", "Kapasia", "Sreepur"],
-                "Narayanganj": ["Narayanganj City", "Araihazar", "Bandar", "Rupganj", "Sonargaon"]
-            }
-        },
-        "Mymensingh": {
-            name: "ময়মনসিংহ",
-            districts: {
-                "Mymensingh": ["Mymensingh City", "Trishal", "Bhaluka", "Gaffargaon", "Muktagacha", "Ishwarganj"],
-                "Netrokona": ["Netrokona Sadar", "Kendua", "Mohanganj", "Durgapur"]
-            }
-        },
-        "Chittagong": {
-            name: "চট্টগ্রাম",
-            districts: {
-                "Chittagong": ["Chittagong City", "Hathazari", "Patiya", "Rangunia", "Sandiwp"],
-                "Coxs Bazar": ["Coxs Bazar Sadar", "Chakaria", "Teknaf", "Ukhia"]
-            }
-        }
-        // ... অন্য সব বিভাগ ও জেলা একইভাবে যুক্ত হবে।
+    // Data Structure
+    const bdData = {
+        "ঢাকা": { "ঢাকা": ["ঢাকা শহর", "সাভার", "ধামরাই", "কেরানীগঞ্জ"], "গাজীপুর": ["গাজীপুর সদর", "কালিয়াকৈর", "শ্রীপুর"], "নারায়ণগঞ্জ": ["নারায়ণগঞ্জ সদর", "রূপগঞ্জ", "সোনারগাঁও"] },
+        "চট্টগ্রাম": { "চট্টগ্রাম": ["চট্টগ্রাম শহর", "হাটহাজারী", "পটিয়া", "সন্দ্বীপ"], "কক্সবাজার": ["কক্সবাজার সদর", "টেকনাফ", "উখিয়া"] },
+        "ময়মনসিংহ": { "ময়মনসিংহ": ["ত্রিশাল", "ভালুকা", "গফরগাঁও", "মুক্তাগাছা", "ময়মনসিংহ সদর"], "নেত্রকোনা": ["কেন্দুয়া", "মোহনগঞ্জ", "দুর্গাপুর"] },
+        "রাজশাহী": { "রাজশাহী": ["রাজশাহী শহর", "বাঘা", "পুঠিয়া"], "বগুড়া": ["বগুড়া সদর", "শেরপুর", "শিবগঞ্জ"] },
+        "সিলেট": { "সিলেট": ["সিলেট সদর", "গোলাপগঞ্জ", "বিয়ানীবাজার"], "মৌলভীবাজার": ["শ্রীমঙ্গল", "কুলাউড়া"] },
+        "খুলনা": { "খুলনা": ["খুলনা শহর", "ডুমুরিয়া", "রূপসা"], "যশোর": ["যশোর সদর", "শার্শা"] },
+        "রংপুর": { "রংপুর": ["রংপুর শহর", "মিঠাপুকুর", "কাউনিয়া"], "দিনাজপুর": ["দিনাজপুর সদর", "বিরামপুর"] },
+        "বরিশাল": { "বরিশাল": ["বরিশাল শহর", "বাকেরগঞ্জ", "উজিরপুর"], "ভোলা": ["ভোলা সদর", "চরফ্যাশন"] }
     };
 
-    // Fallback data for missing divisions in sample
-    const divisions = ["Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh"];
-
-    let timerInterval;
-    let currentData = null;
-
-    // Elements
     const divSelect = document.getElementById('select-division');
     const distSelect = document.getElementById('select-district');
     const upaSelect = document.getElementById('select-upazila');
+    let timerInterval;
 
-    // Init
+    // Initialization
     window.onload = () => {
-        // Fill Divisions
-        divisions.forEach(div => {
-            let opt = document.createElement('option');
-            opt.value = div;
-            opt.textContent = bdLocationData[div] ? bdLocationData[div].name : div;
-            divSelect.appendChild(opt);
-        });
-
-        loadUserPreferences();
+        for(let div in bdData) {
+            divSelect.innerHTML += `<option value="${div}">${div}</option>`;
+        }
+        loadSaved();
     };
 
-    // Selection Logic
     divSelect.onchange = () => {
-        distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
-        upaSelect.innerHTML = '<option value="">উপজেলা নির্বাচন করুন</option>';
-        distSelect.disabled = true;
-        upaSelect.disabled = true;
-
-        if (divSelect.value && bdLocationData[divSelect.value]) {
-            const dists = bdLocationData[divSelect.value].districts;
-            for (let d in dists) {
-                let opt = document.createElement('option');
-                opt.value = d;
-                opt.textContent = d;
-                distSelect.appendChild(opt);
-            }
-            distSelect.disabled = false;
+        distSelect.innerHTML = '<option value="">জেলা</option>';
+        distSelect.disabled = false;
+        for(let dist in bdData[divSelect.value]) {
+            distSelect.innerHTML += `<option value="${dist}">${dist}</option>`;
         }
     };
 
     distSelect.onchange = () => {
-        upaSelect.innerHTML = '<option value="">উপজেলা নির্বাচন করুন</option>';
-        upaSelect.disabled = true;
-
-        if (distSelect.value) {
-            const upas = bdLocationData[divSelect.value].districts[distSelect.value];
-            upas.forEach(u => {
-                let opt = document.createElement('option');
-                opt.value = u;
-                opt.textContent = u;
-                upaSelect.appendChild(opt);
-            });
-            upaSelect.disabled = false;
-        }
+        upaSelect.innerHTML = '<option value="">উপজেলা</option>';
+        upaSelect.disabled = false;
+        bdData[divSelect.value][distSelect.value].forEach(u => {
+            upaSelect.innerHTML += `<option value="${u}">${u}</option>`;
+        });
     };
 
     upaSelect.onchange = () => {
-        const locationStr = `${upaSelect.value}, ${distSelect.value}`;
-        fetchTimingsByCity(upaSelect.value, distSelect.value);
+        fetchByCity(upaSelect.value, distSelect.value);
     };
 
-    // Theme
-    document.getElementById('theme-toggle').onclick = () => {
-        const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', theme);
-        document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
-    };
-
-    // API Functions
-    async function fetchTimingsByCity(upa, dist) {
-        updateStatus("তথ্য লোড হচ্ছে...");
-        const url = `https://api.aladhan.com/v1/timingsByCity?city=${upa}&country=Bangladesh&method=1`;
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            processData(data.data, `${upa}, ${dist}`);
-            savePref({upa, dist, div: divSelect.value});
-        } catch (e) { updateStatus("Error!"); }
-    }
-
+    // Auto Detect Location
     document.getElementById('btn-detect').onclick = () => {
+        setStatus("লোকেশন খোঁজা হচ্ছে...");
         if (navigator.geolocation) {
-            updateStatus("লোকেশন শনাক্ত করা হচ্ছে...");
-            navigator.geolocation.getCurrentPosition(pos => {
-                fetchByCoords(pos.coords.latitude, pos.coords.longitude);
-            });
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                // Reverse Geocoding to get address name
+                try {
+                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=bn`);
+                    const geoData = await geoRes.json();
+                    const locName = geoData.address.suburb || geoData.address.town || geoData.address.city || "আপনার এলাকা";
+                    fetchByCoords(latitude, longitude, locName);
+                } catch(e) { fetchByCoords(latitude, longitude, "আপনার এলাকা"); }
+            }, () => setStatus("লোকেশন এক্সেস পাওয়া যায়নি"));
         }
     };
 
-    async function fetchByCoords(lat, lng) {
+    async function fetchByCity(city, district) {
+        setStatus("লোড হচ্ছে...");
+        const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Bangladesh&method=1`;
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            renderUI(data.data, `${city}, ${district}`);
+            saveLoc({type:'city', city, dist: district, div: divSelect.value});
+        } catch(e) { setStatus("এপিআই কানেকশন এরর"); }
+    }
+
+    async function fetchByCoords(lat, lng, name) {
         const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=1`;
         try {
             const res = await fetch(url);
             const data = await res.json();
-            processData(data.data, "আপনার বর্তমান অবস্থান");
-            savePref({lat, lng});
-        } catch (e) { updateStatus("Error!"); }
+            renderUI(data.data, name);
+            saveLoc({type:'coords', lat, lng, name});
+        } catch(e) { setStatus("লোকেশন এরর"); }
     }
 
-    function processData(data, locationLabel) {
-        currentData = data;
-        document.getElementById('location-name').textContent = locationLabel;
-        document.getElementById('date-gregorian').textContent = toBn(data.date.readable);
-        document.getElementById('date-hijri').textContent = toBn(data.date.hijri.day) + " " + data.date.hijri.month.bn + " " + toBn(data.date.hijri.year) + " হিজরি";
+    function renderUI(data, locName) {
+        document.getElementById('loc-display').textContent = locName;
+        const t = data.timings;
+        const rawSehri = t.Fajr.split(' ')[0];
+        const rawIftar = t.Maghrib.split(' ')[0];
 
-        // Bangladesh Adjustments
-        const rawFajr = data.timings.Fajr.split(' ')[0];
-        const rawMaghrib = data.timings.Maghrib.split(' ')[0];
+        // BD Safe Offset: 2 mins added to Iftar
+        const safeIftar = addMinutes(rawIftar, 2);
+
+        document.getElementById('val-sehri').textContent = toBnTime(rawSehri);
+        document.getElementById('val-iftar').textContent = toBnTime(safeIftar);
         
-        // ইফতারের সময় ২ মিনিট বাড়ানো হলো সতর্কতার জন্য
-        const adjustedIftar = addMins(rawMaghrib, 2);
-
-        document.getElementById('val-sehri').textContent = format12(rawFajr);
-        document.getElementById('val-iftar').textContent = format12(adjustedIftar);
+        document.getElementById('date-en').textContent = toBn(data.date.readable);
+        document.getElementById('date-hj').textContent = toBn(data.date.hijri.day) + " " + data.date.hijri.month.bn + " " + toBn(data.date.hijri.year) + " হিজরি";
         
-        updateStatus("");
-        startCountdown(rawFajr, adjustedIftar);
+        setStatus("");
+        startTimer(rawSehri, safeIftar);
     }
 
-    // Helpers
-    function addMins(t, m) {
-        let [h, min] = t.split(':').map(Number);
-        min += m;
-        if(min >= 60) { h++; min -= 60; }
-        return `${h.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
-    }
-
-    function format12(t) {
-        let [h, m] = t.split(':').map(Number);
-        let ampm = h >= 12 ? ' পিএম' : ' এএম';
-        h = h % 12 || 12;
-        return toBn(`${h}:${m.toString().padStart(2,'0')}${ampm}`);
-    }
-
-    function toBn(n) {
-        return n.toString().replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
-    }
-
-    function updateStatus(m) {
-        document.getElementById('status-msg').textContent = m;
-    }
-
-    function startCountdown(s, i) {
+    function startTimer(sehri, iftar) {
         if(timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             const now = new Date();
-            const sehri = new Date();
-            const iftar = new Date();
-            const [sh, sm] = s.split(':');
-            const [ih, im] = i.split(':');
-            sehri.setHours(sh, sm, 0);
-            iftar.setHours(ih, im, 0);
+            const s = new Date(); const i = new Date();
+            const [sh, sm] = sehri.split(':'); const [ih, im] = iftar.split(':');
+            s.setHours(sh, sm, 0); i.setHours(ih, im, 0);
 
             let target, label;
-            if (now < sehri) { target = sehri; label = "সাহরীর বাকি সময়"; }
-            else if (now < iftar) { target = iftar; label = "ইফতারের বাকি সময়"; }
-            else { 
-                target = new Date(sehri); 
-                target.setDate(target.getDate() + 1); 
-                label = "সাহরীর বাকি সময়"; 
-            }
+            if(now < s) { target = s; label = "সাহরীর বাকি সময়"; }
+            else if(now < i) { target = i; label = "ইফতারের বাকি সময়"; }
+            else { target = new Date(s); target.setDate(target.getDate()+1); label = "সাহরীর বাকি সময়"; }
 
-            document.getElementById('next-event-text').textContent = label;
+            document.getElementById('timer-label').textContent = label;
             const diff = target - now;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s_ = Math.floor((diff % 60000) / 1000);
-            document.getElementById('timer-display').textContent = toBn(`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s_.toString().padStart(2,'0')}`);
+            const h = Math.floor(diff/3600000);
+            const m = Math.floor((diff%3600000)/60000);
+            const sec = Math.floor((diff%60000)/1000);
+            document.getElementById('timer').textContent = toBn(`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`);
         }, 1000);
     }
 
-    function savePref(obj) { localStorage.setItem('bd_ramadan_pref', JSON.stringify(obj)); }
-    function loadUserPreferences() {
-        const pref = JSON.parse(localStorage.getItem('bd_ramadan_pref'));
-        if (pref) {
-            if (pref.lat) fetchByCoords(pref.lat, pref.lng);
-            else if (pref.upa) fetchTimingsByCity(pref.upa, pref.dist);
-        } else {
-            fetchTimingsByCity("Dhaka", "Dhaka");
-        }
+    // Utilities
+    function toBn(n) { return n.toString().replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]); }
+    function toBnTime(t) {
+        let [h, m] = t.split(':').map(Number);
+        let suffix = h >= 12 ? " পিএম" : " এএম";
+        h = h % 12 || 12;
+        return toBn(`${h}:${m.toString().padStart(2,'0')}${suffix}`);
     }
+    function addMinutes(t, mins) {
+        let [h, m] = t.split(':').map(Number);
+        m += mins; if(m >= 60) { h++; m -= 60; }
+        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+    }
+    function setStatus(m) { document.getElementById('status').textContent = m; }
+    function saveLoc(p) { localStorage.setItem('ramadan_26_loc', JSON.stringify(p)); }
+    function loadSaved() {
+        const p = JSON.parse(localStorage.getItem('ramadan_26_loc'));
+        if(p) {
+            if(p.type === 'city') fetchByCity(p.city, p.dist);
+            else fetchByCoords(p.lat, p.lng, p.name);
+        } else fetchByCity("ঢাকা শহর", "ঢাকা");
+    }
+
+    // Theme Toggle
+    document.getElementById('theme-toggle').onclick = () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        document.getElementById('theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+    };
 </script>
 </body>
 </html>
