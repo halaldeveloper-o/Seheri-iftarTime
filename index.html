@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="bn" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sehri & Iftar Timetable</title>
+    <style>
+        /* ================= CSS VARIABLES & THEMING ================= */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --primary-color: #008f5a;
+            --primary-hover: #007046;
+            --secondary-text: #666666;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --primary-color: #03dac6;
+            --primary-hover: #018786;
+            --secondary-text: #a0a0a0;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ================= GLOBAL STYLES ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); transition: var(--transition); display: flex; justify-content: center; padding: 20px; line-height: 1.6; }
+        .container { max-width: 600px; width: 100%; }
+
+        /* ================= HEADER & CONTROLS ================= */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { font-size: 1.5rem; color: var(--primary-color); }
+        .controls { display: flex; gap: 10px; }
+        button { background-color: var(--card-bg); color: var(--text-color); border: 1px solid #ccc; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: var(--transition); font-weight: 600; }
+        button:hover { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+
+        /* ================= CARDS ================= */
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); transition: var(--transition); text-align: center; }
+
+        /* ================= LOCATION SECTION ================= */
+        .location-section input { width: calc(50% - 6px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; background-color: var(--bg-color); color: var(--text-color); }
+        .location-section .full-btn { width: 100%; background-color: var(--primary-color); color: #fff; padding: 12px; border: none; margin-top: 5px; }
+        .location-section .full-btn:hover { background-color: var(--primary-hover); }
+        .divider { margin: 15px 0; color: var(--secondary-text); font-size: 0.9rem; }
+
+        /* ================= TIME & DATE SECTION ================= */
+        .date-display { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
+        .hijri-display { font-size: 0.95rem; color: var(--secondary-text); margin-bottom: 20px; }
+        .times-grid { display: flex; justify-content: space-between; gap: 15px; }
+        .time-box { flex: 1; padding: 15px; border-radius: 8px; background-color: var(--bg-color); border: 1px solid rgba(0,0,0,0.05); }
+        .time-box h2 { font-size: 1.2rem; margin-bottom: 10px; }
+        .time-box .time { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
+
+        /* ================= COUNTDOWN ================= */
+        .countdown-container { background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); color: white; }
+        .countdown-title { font-size: 1.1rem; margin-bottom: 10px; }
+        .countdown-timer { font-size: 2.5rem; font-weight: bold; letter-spacing: 2px; }
+
+        /* ================= DUAS ================= */
+        .dua-box { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--bg-color); text-align: left; }
+        .arabic { font-size: 1.6rem; text-align: right; margin-bottom: 10px; font-family: 'Amiri', serif; color: var(--primary-color); }
+        .pronunciation { font-style: italic; color: var(--secondary-text); margin-bottom: 5px; font-size: 0.9rem; }
+        .meaning { font-size: 0.95rem; }
+
+        /* ================= REFERENCE BOX ================= */
+        .reference-box { text-align: left; font-size: 0.85rem; color: var(--secondary-text); border: 1px dashed #ccc; background-color: transparent; }
+        .reference-box ul { margin-left: 20px; margin-top: 10px; }
+        .reference-box a { color: var(--primary-color); text-decoration: none; }
+        
+        #status-msg { font-size: 0.9rem; margin-top: 10px; font-weight: bold; }
+        .error { color: #d9534f; }
+        .success { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="app-title">Ramadan Timetable</h1>
+        <div class="controls">
+            <button id="lang-toggle">English / বাংলা</button>
+            <button id="theme-toggle">🌙/☀️</button>
+        </div>
+    </header>
+
+    <div class="card location-section">
+        <button id="btn-detect" class="full-btn">📍 Auto Detect Location</button>
+        <div class="divider" id="text-or">- OR -</div>
+        <div>
+            <input type="text" id="input-country" placeholder="Country">
+            <input type="text" id="input-city" placeholder="City">
+            <button id="btn-search" class="full-btn">Search Manually</button>
+        </div>
+        <div id="status-msg"></div>
+    </div>
+
+    <div class="card">
+        <div class="date-display" id="date-gregorian">--</div>
+        <div class="hijri-display" id="date-hijri">--</div>
+        <div class="times-grid">
+            <div class="time-box">
+                <h2 id="text-sehri">Sehri</h2>
+                <div class="time" id="time-fajr">--:--</div>
+            </div>
+            <div class="time-box">
+                <h2 id="text-iftar">Iftar</h2>
+                <div class="time" id="time-maghrib">--:--</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card countdown-container">
+        <div class="countdown-title" id="countdown-title">Next event in:</div>
+        <div class="countdown-timer" id="countdown-timer">00:00:00</div>
+    </div>
+
+    <div class="card">
+        <h2 id="title-duas" style="margin-bottom: 15px;">Duas</h2>
+        <div class="dua-box">
+            <strong id="title-sehri-dua">Sehri Dua</strong>
+            <div class="arabic">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</div>
+            <div class="pronunciation" id="pron-sehri-dua">Wa bisawmi ghadinn nawaiytu min shahri ramadan.</div>
+            <div class="meaning" id="mean-sehri-dua">Meaning: I intend to keep the fast for tomorrow in the month of Ramadan.</div>
+        </div>
+        <div class="dua-box">
+            <strong id="title-iftar-dua">Iftar Dua</strong>
+            <div class="arabic">اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</div>
+            <div class="pronunciation" id="pron-iftar-dua">Allahumma inni laka sumtu, wa bika aamantu, wa 'ala rizqika aftartu.</div>
+            <div class="meaning" id="mean-iftar-dua">Meaning: O Allah, I fasted for You and I believe in You and I break my fast with Your sustenance.</div>
+        </div>
+    </div>
+
+    <div class="card reference-box">
+        <strong id="ref-title">📚 References & Sources:</strong>
+        <ul>
+            <li id="ref-api"><strong>Prayer Timings:</strong> Powered by the <a href="https://aladhan.com/prayer-times-api" target="_blank">Aladhan Free API</a> (Method: Standard Islamic Sciences).</li>
+            <li id="ref-geo"><strong>Location Data:</strong> Browser's native HTML5 Geolocation API.</li>
+            <li id="ref-dua"><strong>Duas:</strong> Extracted from authentic Islamic sources (e.g., Hisnul Muslim).</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    /* ================= TRANSLATIONS DICTIONARY ================= */
+    const translations = {
+        en: {
+            appTitle: "Sehri & Iftar Timetable", btnDetect: "📍 Auto Detect Location", textOr: "- OR -",
+            placeholderCountry: "Country (e.g., Bangladesh)", placeholderCity: "City (e.g., Dhaka)",
+            btnSearch: "Search Manually", textSehri: "Sehri (Fajr)", textIftar: "Iftar (Maghrib)",
+            countdownSehri: "Time left for Sehri:", countdownIftar: "Time left for Iftar:",
+            titleDuas: "Daily Duas", titleSehriDua: "Dua for Sehri",
+            pronSehriDua: "Wa bisawmi ghadinn nawaiytu min shahri ramadan.",
+            meanSehriDua: "Meaning: I intend to keep the fast for tomorrow in the month of Ramadan.",
+            titleIftarDua: "Dua for Iftar",
+            pronIftarDua: "Allahumma inni laka sumtu, wa bika aamantu, wa 'ala rizqika aftartu.",
+            meanIftarDua: "Meaning: O Allah, I fasted for You and I believe in You and I break my fast with Your sustenance.",
+            fetching: "Fetching data...", errorLoc: "Location access denied. Try manual search.", 
+            errorApi: "Failed to fetch timings. Check city/country.", successLoc: "Location detected!",
+            refTitle: "📚 References & Sources:", refApi: "Prayer Timings: Powered by Aladhan API (Standard Method).",
+            refGeo: "Location Data: Browser's HTML5 Geolocation API.", refDua: "Duas: Extracted from Hisnul Muslim."
+        },
+        bn: {
+            appTitle: "সাহরী ও ইফতারের সময়সূচী", btnDetect: "📍 স্বয়ংক্রিয় অবস্থান নির্ণয়", textOr: "- অথবা -",
+            placeholderCountry: "দেশ (যেমন: Bangladesh)", placeholderCity: "শহর (যেমন: Dhaka)",
+            btnSearch: "খুঁজুন", textSehri: "সাহরী (ফজর)", textIftar: "ইফতার (মাগরিব)",
+            countdownSehri: "সাহরীর বাকি সময়:", countdownIftar: "ইফতারের বাকি সময়:",
+            titleDuas: "প্রয়োজনীয় দোয়া", titleSehriDua: "সাহরীর দোয়া",
+            pronSehriDua: "উচ্চারণ: ওয়া বিসাওমি গাদিন নাওয়াইতু মিন শাহরি রমাদান।",
+            meanSehriDua: "অর্থ: আমি আগামীকাল রমজান মাসের রোজা রাখার নিয়ত করলাম।",
+            titleIftarDua: "ইফতারের দোয়া",
+            pronIftarDua: "উচ্চারণ: আল্লাহুম্মা ইন্নি লাকা সুমতু, ওয়া বিকা আমানতু, ওয়া আলা রিযকিকা আফতারতু।",
+            meanIftarDua: "অর্থ: হে আল্লাহ! আমি তোমারই সন্তুষ্টির জন্য রোজা রেখেছি এবং তোমারই দেয়া রিযিক দ্বারা ইফতার করছি।",
+            fetching: "তথ্য সংগ্রহ করা হচ্ছে...", errorLoc: "লোকেশন পাওয়া যায়নি। ম্যানুয়ালি খুঁজুন।", 
+            errorApi: "সময়সূচী পাওয়া যায়নি। শহর বা দেশ সঠিক আছে কিনা যাচাই করুন।", successLoc: "অবস্থান শনাক্ত হয়েছে!",
+            refTitle: "📚 তথ্যসূত্র ও সোর্স:", refApi: "নামাজের সময়: Aladhan API ব্যবহার করা হয়েছে।",
+            refGeo: "অবস্থান: ব্রাউজারের জিওলোকেশন API।", refDua: "দোয়া: হিসনুল মুসলিম ও অন্যান্য নির্ভরযোগ্য উৎস থেকে।"
+        }
+    };
+
+    /* ================= STATE MANAGEMENT ================= */
+    let currentLang = localStorage.getItem('lang') || 'bn';
+    let currentTheme = localStorage.getItem('theme') || 'light';
+    let countdownInterval;
+    
+    // Global variable to store current API Data so we can re-render when language changes
+    let currentApiData = null; 
+
+    /* ================= INITIALIZATION ================= */
+    function init() {
+        applyTheme(currentTheme);
+        applyLanguage(currentLang);
+
+        const savedCity = localStorage.getItem('city');
+        const savedCountry = localStorage.getItem('country');
+        const savedLat = localStorage.getItem('lat');
+        const savedLng = localStorage.getItem('lng');
+
+        if (savedLat && savedLng) {
+            fetchTimingsByCoords(savedLat, savedLng);
+        } else if (savedCity && savedCountry) {
+            document.getElementById('input-city').value = savedCity;
+            document.getElementById('input-country').value = savedCountry;
+            fetchTimingsByCity(savedCity, savedCountry);
+        }
+    }
+
+    /* ================= THEME & LANGUAGE LOGIC ================= */
+    function applyTheme(theme) {
+        currentTheme = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    });
+
+    function applyLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('lang', lang);
+        const t = translations[lang];
+
+        document.getElementById('app-title').textContent = t.appTitle;
+        document.getElementById('btn-detect').textContent = t.btnDetect;
+        document.getElementById('text-or').textContent = t.textOr;
+        document.getElementById('input-country').placeholder = t.placeholderCountry;
+        document.getElementById('input-city').placeholder = t.placeholderCity;
+        document.getElementById('btn-search').textContent = t.btnSearch;
+        document.getElementById('text-sehri').textContent = t.textSehri;
+        document.getElementById('text-iftar').textContent = t.textIftar;
+        document.getElementById('title-duas').textContent = t.titleDuas;
+        document.getElementById('title-sehri-dua').textContent = t.titleSehriDua;
+        document.getElementById('pron-sehri-dua').textContent = t.pronSehriDua;
+        document.getElementById('mean-sehri-dua').textContent = t.meanSehriDua;
+        document.getElementById('title-iftar-dua').textContent = t.titleIftarDua;
+        document.getElementById('pron-iftar-dua').textContent = t.pronIftarDua;
+        document.getElementById('mean-iftar-dua').textContent = t.meanIftarDua;
+        
+        // References text
+        document.getElementById('ref-title').textContent = t.refTitle;
+        document.getElementById('ref-api').innerHTML = `<strong>${t.refApi.split(':')[0]}:</strong> ${t.refApi.split(':')[1]}`;
+        document.getElementById('ref-geo').innerHTML = `<strong>${t.refGeo.split(':')[0]}:</strong> ${t.refGeo.split(':')[1]}`;
+        document.getElementById('ref-dua').innerHTML = `<strong>${t.refDua.split(':')[0]}:</strong> ${t.refDua.split(':')[1]}`;
+
+        // Re-render API data if exists (to update AM/PM and numerals)
+        if (currentApiData) {
+            renderDataDisplay();
+        }
+    }
+
+    document.getElementById('lang-toggle').addEventListener('click', () => {
+        applyLanguage(currentLang === 'bn' ? 'en' : 'bn');
+    });
+
+    /* ================= HELPERS ================= */
+    function showStatus(msgKey, type = "error") {
+        const msgDiv = document.getElementById('status-msg');
+        msgDiv.textContent = translations[currentLang][msgKey];
+        msgDiv.className = type;
+    }
+
+    function toBengaliDigits(str) {
+        const bnDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+        return str.replace(/\d/g, d => bnDigits[d]);
+    }
+
+    /* ================= LOCATION & API FETCHING ================= */
+    document.getElementById('btn-detect').addEventListener('click', () => {
+        showStatus('fetching', 'success');
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    localStorage.removeItem('city');
+                    localStorage.removeItem('country');
+                    localStorage.setItem('lat', lat);
+                    localStorage.setItem('lng', lng);
+                    fetchTimingsByCoords(lat, lng);
+                },
+                (error) => { showStatus('errorLoc', 'error'); }
+            );
+        } else {
+            showStatus('errorLoc', 'error');
+        }
+    });
+
+    document.getElementById('btn-search').addEventListener('click', () => {
+        const city = document.getElementById('input-city').value.trim();
+        const country = document.getElementById('input-country').value.trim();
+        if (city && country) {
+            localStorage.removeItem('lat');
+            localStorage.removeItem('lng');
+            localStorage.setItem('city', city);
+            localStorage.setItem('country', country);
+            fetchTimingsByCity(city, country);
+        }
+    });
+
+    async function fetchTimingsByCoords(lat, lng) {
+        showStatus('fetching', 'success');
+        try {
+            const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=1`);
+            const data = await res.json();
+            currentApiData = data.data;
+            renderDataDisplay();
+            showStatus('successLoc', 'success');
+            setTimeout(() => { document.getElementById('status-msg').textContent = ""; }, 3000);
+        } catch (err) { showStatus('errorApi', 'error'); }
+    }
+
+    async function fetchTimingsByCity(city, country) {
+        showStatus('fetching', 'success');
+        try {
+            const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=1`);
+            const data = await res.json();
+            currentApiData = data.data;
+            renderDataDisplay();
+            document.getElementById('status-msg').textContent = "";
+        } catch (err) { showStatus('errorApi', 'error'); }
+    }
+
+    /* ================= DATA PROCESSING & DISPLAY ================= */
+    function renderDataDisplay() {
+        if (!currentApiData) return;
+
+        const timings = currentApiData.timings;
+        const dateObj = currentApiData.date;
+
+        // CRITICAL FIX: Aladhan returns "05:14 (+06)". We must split by space and take the first part to get raw HH:MM
+        const fajrRaw = timings.Fajr.split(' ')[0]; 
+        const maghribRaw = timings.Maghrib.split(' ')[0];
+
+        // Format dates
+        let gregDate = dateObj.readable;
+        let hijriDate = `${dateObj.hijri.day} ${dateObj.hijri.month.en} ${dateObj.hijri.year} AH`;
+
+        if (currentLang === 'bn') {
+            gregDate = toBengaliDigits(gregDate);
+            hijriDate = toBengaliDigits(hijriDate);
+        }
+
+        document.getElementById('date-gregorian').textContent = gregDate;
+        document.getElementById('date-hijri').textContent = hijriDate;
+        document.getElementById('time-fajr').textContent = formatTo12Hour(fajrRaw);
+        document.getElementById('time-maghrib').textContent = formatTo12Hour(maghribRaw);
+
+        startCountdown(fajrRaw, maghribRaw);
+    }
+
+    function formatTo12Hour(timeStr) {
+        let [hours, minutes] = timeStr.split(':');
+        hours = parseInt(hours);
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        if(currentLang === 'bn') ampm = hours >= 12 ? 'পিএম' : 'এএম';
+        
+        hours = hours % 12 || 12;
+        let formatted = `${hours}:${minutes} ${ampm}`;
+        if(currentLang === 'bn') formatted = toBengaliDigits(formatted);
+        return formatted;
+    }
+
+    /* ================= COUNTDOWN LOGIC ================= */
+    function startCountdown(fajrTime, maghribTime) {
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        const [fHr, fMin] = fajrTime.split(':').map(Number);
+        const [mHr, mMin] = maghribTime.split(':').map(Number);
+
+        countdownInterval = setInterval(() => {
+            const now = new Date();
+            const fajrDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), fHr, fMin, 0);
+            const maghribDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), mHr, mMin, 0);
+
+            let targetDate;
+            let isNextSehri = false;
+
+            if (now < fajrDate) {
+                targetDate = fajrDate;
+                isNextSehri = true;
+            } else if (now < maghribDate) {
+                targetDate = maghribDate;
+                isNextSehri = false;
+            } else {
+                targetDate = new Date(fajrDate);
+                targetDate.setDate(targetDate.getDate() + 1); // Next day's Sehri
+                isNextSehri = true;
+            }
+
+            document.getElementById('countdown-title').textContent = isNextSehri 
+                ? translations[currentLang].countdownSehri 
+                : translations[currentLang].countdownIftar;
+
+            const diff = targetDate - now;
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            let timerStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (currentLang === 'bn') timerStr = toBengaliDigits(timerStr);
+            
+            document.getElementById('countdown-timer').textContent = timerStr;
+
+        }, 1000);
+    }
+
+    // Run Initialization on load
+    init();
+</script>
+</body>
+</html>
